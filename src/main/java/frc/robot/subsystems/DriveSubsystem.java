@@ -71,10 +71,13 @@ public class DriveSubsystem extends SubsystemBase {
 
   //---------------------------Place Getters Here-------------------------------
 
+  //Name: Jack DeRuntz
+  //About: Gets the angle of the robot
   public double getYaw(){
     return -navx.getAngle();
   }
-
+  //Name: Jack DeRuntz
+  //About: Gets the angle of the robot
   public Rotation2d getHeading(){
     return Rotation2d.fromDegrees(Math.IEEEremainder(getYaw(), 360.0d));
   }
