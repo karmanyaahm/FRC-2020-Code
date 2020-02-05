@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj.util.Units;
 public class DriveSubsystem extends SubsystemBase {
 
       //Motors
-      TalonFX leftDrivePrimary = new TalonFX(10);//Change This
+      TalonFX leftDrivePrimary = new TalonFX(20);//Change This
       TalonFX leftDriveBack = new TalonFX(11);
       TalonFX rightDrivePrimary = new TalonFX(12);
       TalonFX rightDriveBack = new TalonFX(13);
