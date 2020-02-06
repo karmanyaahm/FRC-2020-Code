@@ -27,6 +27,7 @@ public class FeederToShooter extends SubsystemBase {
 
   }
 
+  //Name: Brennan
   //About: make the "power cell" go forward 
   public void intaketoShooter(){
     conveyor_one.set(ControlMode.PercentOutput, .5);
@@ -37,7 +38,8 @@ public class FeederToShooter extends SubsystemBase {
     return;
   }
 
-  //make go backward
+  //Name: Brennan 
+  //About: make the motors go backward
   public void reverseIntake(){
     conveyor_one.set(ControlMode.PercentOutput, -0.5);
     conveyor_two.set(ControlMode.PercentOutput, -0.5);
@@ -46,8 +48,9 @@ public class FeederToShooter extends SubsystemBase {
     converyor_up.set(ControlMode.PercentOutput, -0.3);
   }
 
-  //stop 
-  public void shitStop(){
+  //Name: Brennan 
+  //About: stop the motors  
+  public void Stop(){
     conveyor_one.set(ControlMode.PercentOutput, 0.0);
     conveyor_two.set(ControlMode.PercentOutput, 0.0);
     conveyor_three.set(ControlMode.PercentOutput, 0.0);

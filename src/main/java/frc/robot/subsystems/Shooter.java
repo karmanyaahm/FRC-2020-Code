@@ -30,13 +30,192 @@ public class Shooter extends SubsystemBase {
   private double velo = 0.0;
 
   //About: instaciate the subsystems 
+  private Limelight m_limelight = new Limelight();
 
   public Shooter() {
+    //About: reset the motors to factory default 
+    Shooter_1.configFactoryDefault();
+    Shooter_2.configFactoryDefault();
+    hoodAdjuster.configFactoryDefault();
 
+    //About: configure the motors 
+    configureMotors();
+    configClosedLoop();
+
+    //About: create the followers  
+    Shooter_2.follow(Shooter_1);
   }
 
+  //---------------------------Place Setters Here-------------------------------
+
+  //Name: Brennan 
+  //About: configure the flywheel motors so that they spin at the desired velo 
+  private void configureMotors(){
+    Shooter_1.setInverted(false);
+    Shooter_1.configOpenloopRamp(2.0, 0);
+    Shooter_1.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0,0);
+    Shooter_1.setSensorPhase(true); 
+    
+    Shooter_2.setInverted(true);
+  }
+
+  //Name: Brennan 
+  //About: configure the flywheels for the most optimal and set the PID loops  
+  public void configClosedLoop(){
+    Shooter_1.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 0);
+    Shooter_2.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 0);
+
+    Shooter_1.configClosedloopRamp(0.5);
+    Shooter_2.configClosedloopRamp(0.5);
+    Shooter_1.configAllowableClosedloopError(0, 50);
+    Shooter_2.configAllowableClosedloopError(0, 50);
+
+    //About: how to calculate kF https://phoenix-documentation.readthedocs.io/en/latest/ch16_ClosedLoop.html#calculating-velocity-feed-forward-gain-kf
+    Shooter_1.config_kF(0, 0);
+    Shooter_1.config_kP(0, 0);
+    Shooter_1.config_kI(0, 0);
+    Shooter_1.config_kD(0, 0);
+  }
+
+  //Name: Brennan 
+  //About: Configure the hood motor to prepare it for positon control
+  public void configHoodClosedLoop(){
+
+    //configure the voltage 
+    hoodAdjuster.configVoltageCompSaturation(12.0,0);
+    hoodAdjuster.enableVoltageCompensation(true);
+
+    //set the limits of the shooter 
+    hoodAdjuster.configForwardSoftLimitThreshold(1024);
+    hoodAdjuster.configNominalOutputForward(0);
+
+    //set the speed limits 
+    hoodAdjuster.configPeakOutputForward(0.4);
+    hoodAdjuster.configPeakOutputReverse(-0.4);
+
+    //tell it how long it should take to get there 
+    hoodAdjuster.configClosedloopRamp(0.10);
+    
+    //set the motor into positon mode and set the encoder
+    hoodAdjuster.set(ControlMode.Position, 0.0);
+    hoodAdjuster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder,0,0);
+
+    //configure the PID loop 
+    hoodAdjuster.config_kP(0, 0.2);
+    hoodAdjuster.config_kI(0, 0);
+    hoodAdjuster.config_kD(0, 0);
+    hoodAdjuster.config_kF(0, .2);
+
+    //zero out the position 
+    hoodAdjuster.setSelectedSensorPosition(0,0,0);
+  }
+
+  //---------------------------Place Getters Here-------------------------------
+
+  //Name: Brennan 
+  //About: get the velocities for the shooter 
+  public int getShooter_1Velo(){
+    return Shooter_1.getSelectedSensorVelocity();
+  }
+
+  //Name: Brennan 
+  //About: get the velocities for the shooter 
+  public int getShooter_2Velo(){
+    return Shooter_2.getSelectedSensorVelocity();
+  }
+
+  //Name: Brennan 
+  //About: get the angle of the hood motor in degrees using the CTRE mag encoder 
+  public double getencoderAngle(){
+    //TODO: double check the math put into this and hard code it into the constants 
+    System.out.println(hoodAdjuster.getSelectedSensorPosition() * 0.087890625);
+    return hoodAdjuster.getSelectedSensorPosition() * 0.087890625;
+  }
+
+  //Name: Jack
+  //About: Configures the kF for the shooter as long as all the constants are correct 
+  public double getShooterkF(double RPM){
+    //TODO: Change the max RPM of the Shooter as Oscar finishes 
+    double maxRPM = 6200;
+    double percentOutput = RPM/maxRPM;
+
+    double kF = (percentOutput*Constants.encoderTicksPerRev)/RPM;
+    
+    return kF;
+  }
+
+  //Name: Brennan 
+  //About: use a reference table to find the optimal shooter angle @ set distances (units feet and degrees)
+  public double hoodAngleTable(){
+    double setAngle = 0;
+
+    if ((m_limelight.distanceToTarget() >= 0 ) && (m_limelight.distanceToTarget() < .5 )){
+      setAngle = 87;
+    }
+    else if ((m_limelight.distanceToTarget() >= .5 ) && (m_limelight.distanceToTarget() < 3 )){
+      setAngle = 63;
+    }
+    else if ((m_limelight.distanceToTarget() >= 3 ) && (m_limelight.distanceToTarget() < 4.5 )){
+      setAngle = 59;
+    }
+    else if ((m_limelight.distanceToTarget() >= 4.5 ) && (m_limelight.distanceToTarget() < 7.5 )){
+      setAngle = 29;
+    }
+    else if ((m_limelight.distanceToTarget() >= 7.5 ) && (m_limelight.distanceToTarget() < 9.5 )){
+      setAngle = 35;
+    }
+    else if ((m_limelight.distanceToTarget() >= 9.5 ) && (m_limelight.distanceToTarget() < 11.5 )){
+      setAngle = 34;
+    }
+    else if ((m_limelight.distanceToTarget() >= 11.5 ) && (m_limelight.distanceToTarget() < 13.5 )){
+      setAngle = 30;
+    }
+    else if ((m_limelight.distanceToTarget() >= 13.5 ) && (m_limelight.distanceToTarget() < 14.5 )){
+      setAngle = 29; //tech 28.5
+    }
+    else if ((m_limelight.distanceToTarget() >= 14.5 ) && (m_limelight.distanceToTarget() < 15.5 )){
+      setAngle = 28;
+    }
+    else if ((m_limelight.distanceToTarget() >= 15.5 ) && (m_limelight.distanceToTarget() < 17.5 )){
+      setAngle = 22; //tech 22.5
+    }
+    else if ((m_limelight.distanceToTarget() >= 17.5 ) && (m_limelight.distanceToTarget() < 20 )){
+      setAngle = 23;
+    }
+    System.out.println("Set Shooter velocity" + setAngle);
+    
+    return setAngle;
+  }
+
+   //---------------------------Place Others Here-------------------------------
+
+  //Name: Brennan 
+  //About: Useing velocity mode set the angular velocity of the shooter 
+  public void setShootSpeed(double velocity){
+    //TODO: Make Sure this works before you commit it 
+    velo = velocity;
+    Shooter_1.set(TalonFXControlMode.Velocity, velo);
+  }
+
+  //Name: Brennan 
+  //About: Using Percent Output set the power for the shooter 
+  public void setPower(double power){
+    //TODO: Config somewhere else
+    Shooter_1.configNominalOutputForward(0.0, 0);
+    Shooter_1.configNominalOutputReverse(0.0, 0);
+
+    Shooter_1.setNeutralMode(NeutralMode.Coast);
+    Shooter_1.set(ControlMode.PercentOutput, power);
+  }
+
+  //Name: Brennan, Dante
+  //About: set the hood angle with the position control mode
+  public void setHoodWithAngle(double feedforward){
+    hoodAdjuster.set(ControlMode.Position, hoodAngleTable() * 0.08789062);
+  }
+  
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+   
   }
 }
