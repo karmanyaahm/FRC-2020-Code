@@ -28,4 +28,14 @@ public final class Constants {
     public static final double kA = 0.249;
     public static final double kP = 0.0;//0.0405;
     public static final double kD = 0.0;
+
+    //About: create a seperate class to store all of the limelight variables 
+    public static final class LimelightConstants{
+
+    //About: Set the camera height and goal height for distance calculations 
+    public static final double cameraHeight = 2.583; //Camera height in meters
+    public static final double goalHeight = 8.1875; //Hatch panel height in meters
+    public static final double mountAngle = .436332; //26.3258
+
+    }
 }
