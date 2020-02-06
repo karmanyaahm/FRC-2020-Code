@@ -12,10 +12,13 @@ import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.Constants;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
@@ -37,6 +40,13 @@ public class DriveSubsystem extends SubsystemBase {
       TalonFX rightDriveBack = new TalonFX(13);
       //Gyro
       AHRS navx = new AHRS(SPI.Port.kMXP);
+      //create the penumatics 
+      DoubleSolenoid driveShift = new DoubleSolenoid(0,1);
+      //things for motion magic
+      StringBuilder _sb = new StringBuilder();
+      int _smoothing = 0;
+      int _pov = -1;
+      private boolean m_configCorrectly = true;
   
       //Ramsete Stuff
       DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(Constants.distBetweenWheelsInches));
@@ -67,6 +77,81 @@ public class DriveSubsystem extends SubsystemBase {
     rightDrivePrimary.set(ControlMode.PercentOutput, rightVoltage/12);
   }
 
+  public void configElevatorMagic(){
+    //set the motors to factory default 
+    leftDrivePrimary.configFactoryDefault();
+    leftDriveBack.configFactoryDefault();
+    rightDrivePrimary.configFactoryDefault();
+    rightDriveBack.configFactoryDefault();
+
+    //Configures the MagEncoders into Relative mode
+    leftDrivePrimary.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+    rightDrivePrimary.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+    leftDrivePrimary.setSelectedSensorPosition(0);
+    rightDrivePrimary.setSelectedSensorPosition(0);
+
+    //Set the sensor phase
+    leftDrivePrimary.setSensorPhase(false);
+    rightDrivePrimary.setSensorPhase(false);
+
+    //Set inverted
+    rightDrivePrimary.setInverted(true);
+    rightDriveBack.setInverted(true);
+    leftDrivePrimary.setInverted(false);
+    leftDriveBack.setInverted(false);
+
+    //This makes the slave controllers follow the output values of the master controllers
+    leftDriveBack.follow(leftDrivePrimary);
+    rightDriveBack.follow(rightDrivePrimary);
+
+    //Enables voltage compensation, it will take the battery voltage into account when trying to drive the robot.
+    leftDrivePrimary.enableVoltageCompensation(false);
+    rightDrivePrimary.enableVoltageCompensation(false);
+    leftDrivePrimary.configVoltageCompSaturation(Constants.voltageSaturation);
+    rightDrivePrimary.configVoltageCompSaturation(Constants.voltageSaturation);
+
+    //config the outputs 
+    leftDrivePrimary.configNominalOutputForward(0, 0);
+    rightDrivePrimary.configNominalOutputForward(0, 0);
+
+    leftDrivePrimary.configPeakOutputForward(.6, 0);
+    rightDrivePrimary.configPeakOutputForward(.6, 0);
+
+    //config the neuteral mode 
+    leftDrivePrimary.setNeutralMode(NeutralMode.Brake);
+    rightDrivePrimary.setNeutralMode(NeutralMode.Brake);
+    leftDriveBack.setNeutralMode(NeutralMode.Brake);
+    rightDriveBack.setNeutralMode(NeutralMode.Brake);
+
+    //config accel and vcrusie velocity
+    leftDrivePrimary.configMotionAcceleration(5000);
+    leftDrivePrimary.configMotionCruiseVelocity(70000);
+    rightDrivePrimary.configMotionAcceleration(5000);
+    rightDrivePrimary.configMotionCruiseVelocity(70000);
+
+    //zero out the things 
+    leftDrivePrimary.setSelectedSensorPosition(0, 0, 0);
+    rightDrivePrimary.setSelectedSensorPosition(0, 0, 0);
+
+    //set the PID values for the master motor controllers 
+    //TODO: config the kP values and the kF values to ensure the proper drive 
+    rightDrivePrimary.config_kP(0, 0.2);
+    rightDrivePrimary.config_kI(0, 0);
+    rightDrivePrimary.config_kD(0, 0);
+    rightDrivePrimary.config_kF(0, 0.2);
+
+    //TODO: config the kP values and the kF values to ensure the proper drive 
+    leftDrivePrimary.config_kP(0, 0.2);
+    rightDrivePrimary.config_kI(0, 0);
+    leftDrivePrimary.config_kD(0, 0);
+    leftDrivePrimary.config_kF(0, 0.2);
+
+    rightDrivePrimary.configVoltageCompSaturation(12.0);
+    leftDrivePrimary.configVoltageCompSaturation(12.0);    
+
+
+    m_configCorrectly = false;
+  }
 
 
   //---------------------------Place Getters Here-------------------------------
@@ -127,9 +212,6 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
 
-
-
-
   //---------------------------Place Others Here--------------------------------
   public void resetEncoders() {
     leftDrivePrimary.setSelectedSensorPosition(0);
@@ -151,7 +233,53 @@ public class DriveSubsystem extends SubsystemBase {
       );
   }
 
+  //Name: Brennan 
+  //About: create the ebrake
+  public void ebrake(){
+    leftDrivePrimary.setNeutralMode(NeutralMode.Brake);
+    rightDrivePrimary.setNeutralMode(NeutralMode.Brake);
+    leftDriveBack.setNeutralMode(NeutralMode.Brake);
+    rightDriveBack.setNeutralMode(NeutralMode.Brake);
+  }
 
+  //Name: Brennan 
+  //About: revert the ebrake
+  public void no_ebrake(){
+    leftDrivePrimary.setNeutralMode(NeutralMode.Coast);
+    rightDrivePrimary.setNeutralMode(NeutralMode.Coast);
+    leftDriveBack.setNeutralMode(NeutralMode.Coast);
+    rightDriveBack.setNeutralMode(NeutralMode.Coast);
+  }
+
+  //Name: Brennan
+  //About: shift the pistons on and off to switch from drive to elevator mode
+  public void shiftPiston(){
+    switch (driveShift.get()){
+      case kOff:
+        driveShift.set(DoubleSolenoid.Value.kForward);
+       break;
+      case kForward:
+        driveShift.set(DoubleSolenoid.Value.kReverse);
+       break;
+      case kReverse:
+        driveShift.set(DoubleSolenoid.Value.kForward);
+        break;
+    }
+  }
+
+  //Name: Brennan 
+  //About: rotate the drive motors for elevator control using magic motion
+  public void elevatorMotionMagic(double wheelrotRight, double wheelrotLeft){
+    if(m_configCorrectly){
+      configElevatorMagic();
+    }
+
+    double targetPosition =  Constants.encoderTicksPerRev * wheelrotRight * Constants.kGearRatio; //10.
+    double targetPosition2 = Constants.encoderTicksPerRev * wheelrotLeft * Constants.kGearRatio;
+  
+    rightDrivePrimary.set(ControlMode.MotionMagic, targetPosition);
+    leftDrivePrimary.set(ControlMode.MotionMagic, targetPosition2);
+  }
 
   @Override
   public void periodic() {
@@ -218,5 +346,3 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
 }
-
-

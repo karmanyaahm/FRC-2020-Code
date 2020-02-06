@@ -60,7 +60,7 @@ public class Shooter extends SubsystemBase {
   }
 
   //Name: Brennan 
-  //About: configure the flywheels for the most optimal and set the PID loops  
+  //About: configure the flywheels and set the PID loops(create the horizontal asympote for the velocity to get to) for the most optimal velocity control  
   public void configClosedLoop(){
     Shooter_1.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 0);
     Shooter_2.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 0);

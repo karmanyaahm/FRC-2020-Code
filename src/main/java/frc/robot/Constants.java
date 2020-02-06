@@ -18,16 +18,19 @@ package frc.robot;
 public final class Constants {
     
     public static final double distBetweenWheelsInches = 28;//26.84603809585759;
-    public static final double gearRatio = 1 / 8.45;
+    public static final double gearRatio = 1 / 8.45; //need to double check 
     public static final double wheelDiameterInches = 6;//18;
     public static final double wheelCircumferenceInches = wheelDiameterInches * Math.PI;
     public static final double encoderTicksPerRev = 2048;
+    public static final int voltageSaturation = 10;
+    public static final double kGearRatio = 8.45;
 
     public static final double kS = 0.358;
     public static final double kV = 3.02;
     public static final double kA = 0.249;
     public static final double kP = 0.0;//0.0405;
     public static final double kD = 0.0;
+
 
     //About: create a seperate class to store all of the limelight variables 
     public static final class LimelightConstants{

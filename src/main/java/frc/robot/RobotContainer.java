@@ -10,6 +10,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import java.util.Arrays;
@@ -23,13 +24,15 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
-import frc.robot.commands.PlayerDrive;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.FeederToShooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import frc.robot.commands.PlayerDrive;
-
+import frc.robot.commands.drivetrainShifter;
+import frc.robot.commands.shootercommand.FeedToWheel;
 
 
 public class RobotContainer {
@@ -37,6 +40,7 @@ public class RobotContainer {
 
   //Define Subsystems Here
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
+  private final FeederToShooter m_conveyor = new FeederToShooter();
 
   //Define Commands Here
   
@@ -69,6 +73,11 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    new JoystickButton(driver, Button.kStickRight.value).whenPressed(new drivetrainShifter(m_driveSubsystem));
+    new JoystickButton(driver, Button.kStickLeft.value)
+      .whenPressed(()-> m_driveSubsystem.ebrake())
+      .whenReleased(()-> m_driveSubsystem.no_ebrake());
+    new JoystickButton(driver, Button.kB.value).toggleWhenPressed(new FeedToWheel(m_conveyor));
   }
 
 
