@@ -15,17 +15,15 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Limelight;
 
-import frc.robot.RobotContainer;
-
 public class LimeDrive extends CommandBase {
   private final DriveSubsystem drivesubsystem;
   private final Limelight limelight;
   private final DoubleSupplier m_speed; 
+
   public LimeDrive(DoubleSupplier speed, DriveSubsystem m_drive, Limelight m_limelight) {
     drivesubsystem = m_drive;
     limelight = m_limelight;
     m_speed = speed;
-
 
     addRequirements(m_drive);
     addRequirements(m_limelight);
@@ -33,6 +31,8 @@ public class LimeDrive extends CommandBase {
 
   @Override
   public void initialize() {
+    //About: start the brake so you don't overshoot
+    drivesubsystem.ebrake();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -44,7 +44,6 @@ public class LimeDrive extends CommandBase {
       Remember to reconfigure Kp and minPower depending on the driving surface,
       esp. before competition
     */
-
     double headingError = limelight.getHorizontalOffset();
     double steeringAdjust = 0.0f;
     double kP = 0.05;
@@ -57,17 +56,15 @@ public class LimeDrive extends CommandBase {
       else if (headingError < 1){ 
         steeringAdjust = kP *headingError + minPower;
       }
-
       drivesubsystem.PortedArcadeDrive(m_speed.getAsDouble(), steeringAdjust);
     }
-
-
-    
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    //About: end the brake mode for standard drive
+    drivesubsystem.no_ebrake();
   }
 
   // Returns true when the command should end.
