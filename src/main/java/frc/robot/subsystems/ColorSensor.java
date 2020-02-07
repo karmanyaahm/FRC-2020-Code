@@ -16,8 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.revrobotics.ColorSensorV3;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
-
-//tihs sets the values for the color sensor 
+ 
 public class ColorSensor extends SubsystemBase {
 
   //About: config the color sensor for the ports onthe RIO
@@ -36,11 +35,17 @@ public class ColorSensor extends SubsystemBase {
   String colorString;    
   ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
 
+  //---------------------------Place Getters Here-------------------------------
+  
+  //Name: Brennan
   //About: get the result of the color sensor 
   public void ColorMatchResult(){
     match = m_colorMatcher.matchClosestColor(detectedColor);
   }
 
+  //---------------------------Place Setters Here-------------------------------
+
+  //Name: Brennan
   //About: make the sensor match the color 
   public void colorMatch(){
     m_colorMatcher.addColorMatch(kBlueTarget);
@@ -48,9 +53,20 @@ public class ColorSensor extends SubsystemBase {
     m_colorMatcher.addColorMatch(kRedTarget);
     m_colorMatcher.addColorMatch(kYellowTarget);
   }
+  
+  //---------------------------Place Others Here-------------------------------
 
+  //Name: Brennan
+  //About: display the color on the dash board
   public void colorDash(){
     SmartDashboard.putString("Detected Color", colorString);
+  }
+
+  @Override
+  public void periodic() {
+    //About: Find the color that is being detected Display the colorMatcher
+    colorDash();
+    colorMatch();
   }
 
 }
