@@ -41,4 +41,17 @@ public final class Constants {
     public static final double mountAngle = .436332; //26.3258
 
     }
+
+    //About: create a seperate class to store all of the constants for the hood and flywheels 
+    public static final class ShooterConstants{
+
+        //About: set the ticks and the RPM and Ticks conversions 
+        public static final double veloTPR = 1023;
+        public static final double ticksPerRPM = (2048*60)/(600*16);
+        public static final double RPMPerTicks = (600*16)/(2048*60);
+
+        //About: the constant varialbes for the hood of the shooter 
+        public static final double hoodGearRatio = 1/4;
+        public static final double hoodTPR = 4096;
+    }
 }

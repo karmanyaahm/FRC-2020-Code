@@ -134,13 +134,11 @@ public class DriveSubsystem extends SubsystemBase {
     rightDrivePrimary.setSelectedSensorPosition(0, 0, 0);
 
     //set the PID values for the master motor controllers 
-    //TODO: config the kP values and the kF values to ensure the proper drive 
     rightDrivePrimary.config_kP(0, 0.2);
     rightDrivePrimary.config_kI(0, 0);
     rightDrivePrimary.config_kD(0, 0);
     rightDrivePrimary.config_kF(0, 0.2);
 
-    //TODO: config the kP values and the kF values to ensure the proper drive 
     leftDrivePrimary.config_kP(0, 0.2);
     rightDrivePrimary.config_kI(0, 0);
     leftDrivePrimary.config_kD(0, 0);
@@ -148,7 +146,6 @@ public class DriveSubsystem extends SubsystemBase {
 
     rightDrivePrimary.configVoltageCompSaturation(12.0);
     leftDrivePrimary.configVoltageCompSaturation(12.0);    
-
 
     m_configCorrectly = false;
   }

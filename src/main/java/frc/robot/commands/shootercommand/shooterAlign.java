@@ -32,16 +32,21 @@ public class shooterAlign extends CommandBase {
 
   @Override
   public void execute() {
+
+    //Name: Brennan 
+    //About: use the constants from the table to move the shooter to the designated angle 
     double kangle = m_shooter.hoodAngleTable();
     m_shooter.setHoodWithAngle(kangle);
   }
 
-  // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    
+    //Name: Brennan 
+    //About: reset the hood angle back tp 90 to reset the shooter 
+    m_shooter.setHoodWithAngle(90);
   }
 
-  // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     return false;

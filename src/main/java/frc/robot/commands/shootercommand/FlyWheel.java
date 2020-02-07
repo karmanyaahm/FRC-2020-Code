@@ -8,8 +8,11 @@
 package frc.robot.commands.shootercommand;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+
+import frc.robot.Constants;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Shooter;
+
 
 public class FlyWheel extends CommandBase {
   private final Shooter m_shooter;
@@ -28,14 +31,19 @@ public class FlyWheel extends CommandBase {
 
   @Override
   public void execute() {
-    //TODO: Check math after the reconfigure 
-    double convertedVelocity = (m_limelight.getShooterVelocity() * 4096 / 600)/2;
+    //Name: Brennan
+    //About: convert the velocity into encoder ticks and account for the gear ratio
+    double convertedVelocity = (m_limelight.getShooterVelocity() * Constants.ShooterConstants.ticksPerRPM);
 
+    //About: activates the flywheels and sets the shooter velocity 
     m_shooter.setShootSpeed(convertedVelocity);
   }
 
   @Override
   public void end(boolean interrupted) {
+
+    //About: turn the flywheels off
+    m_shooter.setPower(0.0);
   }
 
   @Override

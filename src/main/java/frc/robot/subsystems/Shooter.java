@@ -57,6 +57,9 @@ public class Shooter extends SubsystemBase {
     Shooter_1.setSensorPhase(true); 
     
     Shooter_2.setInverted(true);
+    Shooter_2.configOpenloopRamp(2.0, 0);
+    Shooter_2.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0,0);
+    Shooter_2.setSensorPhase(true); 
   }
 
   //Name: Brennan 
@@ -67,14 +70,21 @@ public class Shooter extends SubsystemBase {
 
     Shooter_1.configClosedloopRamp(0.5);
     Shooter_2.configClosedloopRamp(0.5);
-    Shooter_1.configAllowableClosedloopError(0, 50);
-    Shooter_2.configAllowableClosedloopError(0, 50);
+    Shooter_1.configAllowableClosedloopError(0, 10);
+    Shooter_2.configAllowableClosedloopError(0, 10);
 
     //About: how to calculate kF https://phoenix-documentation.readthedocs.io/en/latest/ch16_ClosedLoop.html#calculating-velocity-feed-forward-gain-kf
-    Shooter_1.config_kF(0, 0);
-    Shooter_1.config_kP(0, 0);
+    Shooter_1.config_kF(0, m_limelight.getShooterVelocity()*Constants.ShooterConstants.ticksPerRPM);
+    Shooter_1.config_kP(0, 0.002);
     Shooter_1.config_kI(0, 0);
     Shooter_1.config_kD(0, 0);
+
+    Shooter_2.config_kF(0, m_limelight.getShooterVelocity()*Constants.ShooterConstants.ticksPerRPM);
+    Shooter_2.config_kP(0, 0.002);
+    Shooter_2.config_kI(0, 0);
+    Shooter_2.config_kD(0, 0);
+
+    
   }
 
   //Name: Brennan 
@@ -134,12 +144,11 @@ public class Shooter extends SubsystemBase {
 
   //Name: Jack
   //About: Configures the kF for the shooter as long as all the constants are correct 
-  public double getShooterkF(double RPM){
-    //TODO: Change the max RPM of the Shooter as Oscar finishes 
-    double maxRPM = 6200;
+  public double getShooterkF(double RPM){ 
+    double maxRPM = 19700;
     double percentOutput = RPM/maxRPM;
 
-    double kF = (percentOutput*Constants.encoderTicksPerRev)/RPM;
+    double kF = (percentOutput*1023)/RPM;
     
     return kF;
   }
@@ -211,7 +220,7 @@ public class Shooter extends SubsystemBase {
   //Name: Brennan, Dante
   //About: set the hood angle with the position control mode
   public void setHoodWithAngle(double feedforward){
-    hoodAdjuster.set(ControlMode.Position, hoodAngleTable() * 0.08789062);
+    hoodAdjuster.set(ControlMode.Position, feedforward * 0.08789062);
   }
   
   @Override
