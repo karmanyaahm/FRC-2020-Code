@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -120,6 +121,19 @@ public class Shooter extends SubsystemBase {
     hoodAdjuster.setSelectedSensorPosition(0,0,0);
   }
 
+  //Name: Brennan
+  //About: configure the motors for percent output mode
+  public void setPowerMode(){
+    Shooter_1.configNominalOutputForward(0.0, 0);
+    Shooter_1.configNominalOutputReverse(0.0, 0);
+    Shooter_1.setNeutralMode(NeutralMode.Coast);
+
+    Shooter_2.configNominalOutputForward(0.0, 0);
+    Shooter_2.configNominalOutputReverse(0.0, 0);
+    Shooter_2.setNeutralMode(NeutralMode.Coast);
+
+  }
+
   //---------------------------Place Getters Here-------------------------------
 
   //Name: Brennan 
@@ -134,11 +148,14 @@ public class Shooter extends SubsystemBase {
     return Shooter_2.getSelectedSensorVelocity();
   }
 
+  public int getTotalShooterRPM(){
+    return ((Shooter_1.getSelectedSensorVelocity() + Shooter_2.getSelectedSensorVelocity())/2) * 12;
+  }
+
   //Name: Brennan 
   //About: get the angle of the hood motor in degrees using the CTRE mag encoder 
-  public double getencoderAngle(){
+  public double getHoodAngle(){
     //TODO: double check the math put into this and hard code it into the constants 
-    System.out.println(hoodAdjuster.getSelectedSensorPosition() * 0.087890625);
     return hoodAdjuster.getSelectedSensorPosition() * 0.087890625;
   }
 
@@ -204,17 +221,16 @@ public class Shooter extends SubsystemBase {
     //TODO: Make Sure this works before you commit it 
     velo = velocity;
     Shooter_1.set(TalonFXControlMode.Velocity, velo);
+    Shooter_2.set(TalonFXControlMode.Velocity, velo);
   }
 
   //Name: Brennan 
   //About: Using Percent Output set the power for the shooter 
   public void setPower(double power){
-    //TODO: Config somewhere else
-    Shooter_1.configNominalOutputForward(0.0, 0);
-    Shooter_1.configNominalOutputReverse(0.0, 0);
+    setPowerMode();
 
-    Shooter_1.setNeutralMode(NeutralMode.Coast);
     Shooter_1.set(ControlMode.PercentOutput, power);
+    Shooter_2.set(ControlMode.PercentOutput, power);
   }
 
   //Name: Brennan, Dante
@@ -225,6 +241,8 @@ public class Shooter extends SubsystemBase {
   
   @Override
   public void periodic() {
-   
+    //About: Display all of the values you want to monitor 
+    SmartDashboard.putNumber("Shooter Velocity", getTotalShooterRPM());
+    SmartDashboard.putNumber("Hood Angle", getHoodAngle());
   }
 }
