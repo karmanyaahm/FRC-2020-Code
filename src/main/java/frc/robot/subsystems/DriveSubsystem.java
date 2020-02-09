@@ -37,6 +37,7 @@ public class DriveSubsystem extends SubsystemBase {
       TalonFX rightDriveBack = new TalonFX(13);
       //Gyro
       AHRS navx = new AHRS(SPI.Port.kMXP);
+      
   
       //Ramsete Stuff
       DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(Constants.distBetweenWheelsInches));
